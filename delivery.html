@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة طلبات التوصيل - Tender Frozen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --secondary: #6b7280;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #38bdf8;
+            --light: #f8fafc;
+            --dark: #1f2937;
+            --background: #f1f5f9;
+            --border: #e5e7eb;
+            --whatsapp: #25D366;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --border-radius: 0.75rem;
+            --transition: all 0.2s ease-in-out;
+            --gradient-bg: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            --highlight-bg: #fefce8;
+        }
+        [data-theme="dark"] {
+            --background: #1f2937;
+            --card-bg: #2d3748;
+            --text-primary: #f8fafc;
+            --text-secondary: #d1d5db;
+            --border: #4b5563;
+            --light: #374151;
+            --gradient-bg: linear-gradient(135deg, #1e293b, #334155);
+            --highlight-bg: #3f3f46;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background);
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            direction: rtl;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 0;
+        }
+        .header {
+            background: var(--primary);
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .header-btn {
+            background: var(--secondary);
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-btn:hover {
+            background: #4b5563;
+            transform: scale(1.05);
+            box-shadow: var(--shadow-sm);
+        }
+        .header-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        .header-btn:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        .search-bar {
+            padding: 15px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+        .search-bar input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+        .stats {
+            max-width: 100%;
+            overflow: hidden;
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            border-bottom: 1px solid var(--border);
+        }
+        .stat-card {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+            cursor: default;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        .stat-card:first-child {
+            flex: 1 0 calc(50% - 5px);
+        }
+        .stat-card:nth-child(2) {
+            flex: 1 0 30%;
+        }
+        .stat-card:nth-child(3) {
+            flex: 1 0 90%;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .stat-card p {
+            margin: 8px 0 0;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        .tabs-container {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 15px 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) var(--card-bg);
+        }
+        .tabs-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .tabs-container::-webkit-scrollbar-track {
+            background: var(--card-bg);
+        }
+        .tabs-container::-webkit-scrollbar-thumb {
+            background-color: var(--border);
+            border-radius: 10px;
+            border: 2px solid var(--card-bg);
+        }
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-left: 10px;
+            margin-bottom: -1px;
+            cursor: pointer;
+            background: transparent;
+            border: 1px solid transparent;
+            border-bottom: 3px solid transparent;
+            border-radius: 6px 6px 0 0;
+            font-weight: 500;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+        .tab:hover:not(.active) {
+            background: var(--light);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .tab.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            border: 1px solid var(--border);
+            border-bottom: 3px solid var(--primary);
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+        }
+        .tab .count {
+            background: var(--secondary);
+            color: #fff;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            margin-right: 8px;
+            font-weight: 400;
+        }
+        .tab.active .count {
+            background: var(--primary);
+        }
+        .tab-content {
+            display: none;
+            padding: 15px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 10px;
+        }
+        .order-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+            animation: slideIn 0.4s ease-out;
+            background: var(--gradient-bg);
+        }
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .order-card:hover::before {
+            width: 12px;
+        }
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        .order-card-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--light);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .order-card-header:hover {
+            background: var(--highlight-bg);
+        }
+        .order-card-header .info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .order-card-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .order-card-header .order-id {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .order-card-header .status {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            color: #fff;
+            font-weight: 500;
+            text-align: center;
+            min-width: 80px;
+        }
+        .order-card-header .view-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .order-card-details {
+            padding: 20px;
+            background: var(--card-bg);
+            display: none;
+            animation: expand 0.3s ease;
+        }
+        .order-card-details.active {
+            display: block;
+        }
+        .order-card-details .section {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            background: var(--gradient-bg);
+        }
+        .order-card-details .section h4 {
+            margin: 0 0 10px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .order-card-details .section p,
+        .order-card-details .section a {
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .order-card-details .section a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .order-card-details .section a:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .order-card-details .section .payment-alert {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #fde68a;
+        }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            padding: 12px 0;
+        }
+        .action-btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-sm);
+        }
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        .action-btn:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        .action-btn i {
+            font-size: 1rem;
+        }
+        .action-btn[title]:hover::before {
+            content: attr(title);
+            position: absolute;
+            top: -35px;
+            background: var(--secondary);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .btn-call { background: var(--success); color: #fff; }
+        .btn-call:hover { background: #059669; }
+        .btn-map { background: var(--danger); color: #fff; }
+        .btn-map:hover { background: #dc2626; }
+        .btn-whatsapp { background: var(--whatsapp); color: #fff; }
+        .btn-whatsapp:hover { background: #128C7E; }
+        .btn-delivered { background: var(--info); color: #fff; }
+        .btn-delivered:hover { background: #0ea5e9; }
+        .btn-report { background: var(--warning); color: #fff; }
+        .btn-report:hover { background: #d97706; }
+        .no-orders {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            background: var(--gradient-bg);
+            border-radius: var(--border-radius);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes expand {
+            from { height: 0; opacity: 0; }
+            to { height: auto; opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            .header-btn {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+            .action-btn {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+            .order-card-header h3 {
+                font-size: 1rem;
+            }
+            .order-card-header {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .order-card-header .status {
+                justify-self: start;
+            }
+        }
+        .swal2-popup {
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .swal2-input, .swal2-select {
+            border-radius: 6px !important;
+            border: 1px solid var(--border) !important;
+            font-size: 0.9rem !important;
+        }
+        .swal2-input:focus, .swal2-select:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    <div class="container">
+        <header class="header">
+            <div class="header-actions">
+                <button class="header-btn" id="theme-toggle" title="تبديل الوضع الليلي/النهاري">
+                    <i class="fas fa-moon"></i> الوضع الليلي
+                </button>
+                <button class="header-btn" id="set-driver-settings" title="إعدادات المندوب">
+                    <i class="fas fa-user"></i> إعدادات المندوب
+                </button>
+                <button class="header-btn" onclick="refreshOrders()" title="تحديث الطلبات يدويًا">
+                    <i class="fas fa-sync-alt"></i> تحديث
+                </button>
+                <button class="header-btn" onclick="sendDeliveryReport()" title="إرسال تقرير التوصيلات">
+                    <i class="fas fa-file-alt"></i> إرسال تقرير
+                </button>
+            </div>
+        </header>
+        <div class="search-bar">
+            <input type="text" id="order-filter" placeholder="ابحث برقم الطلب أو اسم العميل..." aria-label="بحث عن الطلبات">
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="tabs-container">
+            <div class="tab active" data-tab="on-delivery">
+                قيد التوصيل <span class="count" id="on-delivery-count">0</span>
+            </div>
+            <div class="tab" data-tab="delivered">
+                تم التوصيل <span class="count" id="delivered-count">0</span>
+            </div>
+        </div>
+        <div class="tab-content active" id="tab-on-delivery">
+            <div class="orders-list" id="orders-on-delivery"></div>
+        </div>
+        <div class="tab-content" id="tab-delivered">
+            <div class="orders-list" id="orders-delivered"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const consumerKey = 'ck_f40406bbecba206fc13e711e2f8df86de26dbbc7';
+        const consumerSecret = 'cs_62458ae4d624c3a04a515c770345466497fd88a5';
+        const storeUrl = 'https://tenderfrozen.com';
+        const driverLocation = [30.0259347, 31.4875687];
+        const reportPhoneNumber = '+201222222383';
+        let orders = { 'on-delivery': [], delivered: [] };
+        let deliveredTotal = 0;
+        let distanceCache = JSON.parse(sessionStorage.getItem('distanceCache')) || {};
+
+        function showLoading() {
+            document.getElementById('loading-overlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            requestAnimationFrame(() => {
+                document.getElementById('loading-overlay').classList.remove('active');
+            });
+        }
+
+        function showNotification(message, type, customIcon = null) {
+            Swal.fire({
+                title: type === 'success' ? 'نجاح!' : type === 'error' ? 'خطأ!' : 'معلومات',
+                text: message,
+                icon: customIcon || type,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: type === 'error' ? 4000 : 3500,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-toast' },
+            });
+        }
+
+        function showWelcomeMessage() {
+            if (!localStorage.getItem('welcomeShown')) {
+                Swal.fire({
+                    title: 'مرحبًا بك!',
+                    text: 'هذه الصفحة لإدارة طلبات التوصيل. يرجى إدخال رقم هاتفك في الإعدادات لعرض الطلبات المخصصة لك.',
+                    icon: 'info',
+                    confirmButtonText: 'حسنًا',
+                }).then(() => {
+                    localStorage.setItem('welcomeShown', 'true');
+                    setDriverSettings();
+                });
+            }
+        }
+
+        function extractLocation(order) {
+            const meta = order.meta_data?.find(m => m.key === '_billing_delivery_location' || m.key === 'delivery_location');
+            const locationUrl = meta?.value || null;
+            if (locationUrl && locationUrl.includes('google.com/maps?q=')) {
+                try {
+                    const coords = locationUrl.split('q=')[1].split(',');
+                    const lat = parseFloat(coords[0]);
+                    const lon = parseFloat(coords[1]);
+                    if (isNaN(lat) || isNaN(lon)) return null;
+                    return { coords: [lat, lon], url: locationUrl };
+                } catch (e) {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function calculateDistance(coord1, coord2) {
+            const cacheKey = `${coord1[0]},${coord1[1]}_${coord2[0]},${coord2[1]}`;
+            if (distanceCache[cacheKey]) return distanceCache[cacheKey];
+            const R = 6371;
+            const dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
+            const dLon = (coord2[1] - coord1[1]) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(coord1[0] * Math.PI / 180) * Math.cos(coord2[0] * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            let distance = R * c;
+            const isUrban = coord2[0] > 29.9 && coord2[0] < 30.2 && coord2[1] > 31.1 && coord2[1] < 31.6;
+            const correctionFactor = isUrban ? 1.3 : 1.15;
+            distance *= correctionFactor;
+            distanceCache[cacheKey] = distance;
+            sessionStorage.setItem('distanceCache', JSON.stringify(distanceCache));
+            return distance;
+        }
+
+        function getPaymentAlert(paymentMethod) {
+            const paymentMessages = {
+                'Cash on delivery': { message: 'تنبيه: الدفع عند الاستلام، تأكد من استلام المبلغ نقدًا.', icon: 'fas fa-money-bill-wave' },
+                'Visa / MasterCard ( On Delivery)': { message: 'لا تنسَ إحضار ماكينة الفيزا', icon: 'fas fa-bank' },
+                'default': { message: 'تنبيه: طريقة دفع غير محددة، تأكد من التفاصيل مع العميل.', icon: 'fas fa-exclamation-circle' },
+            };
+            return paymentMessages[paymentMethod] || paymentMessages['default'];
+        }
+
+        function formatTime(date) {
+            const hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'م' : 'ص';
+            const formattedHours = hours % 12 || 12;
+            return `${formattedHours}:${minutes} ${ampm}`;
+        }
+
+        function formatPhoneNumber(phone) {
+            if (!phone) return '';
+            let cleaned = phone.trim().replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+            if (cleaned.startsWith('+20')) return cleaned;
+            if (cleaned.startsWith('0') && cleaned.length === 11) return '+20' + cleaned.substring(1);
+            if (cleaned.length === 10) return '+20' + cleaned;
+            return cleaned;
+        }
+
+        function saveOrderViewTime(orderId) {
+            const orderData = JSON.parse(localStorage.getItem('orderData')) || {};
+            if (!orderData[orderId]) {
+                orderData[orderId] = { viewTime: new Date().toISOString() };
+                localStorage.setItem('orderData', JSON.stringify(orderData));
+            }
+            return orderData[orderId].viewTime;
+        }
+
+        function saveOrderDelivery(orderId, order) {
+            const orderData = JSON.parse(localStorage.getItem('orderData')) || {};
+            const billing = order.billing || {};
+            const customerName = `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'غير معروف';
+            const deliveryTime = new Date().toISOString();
+            orderData[orderId] = {
+                ...orderData[orderId],
+                orderId: orderId,
+                customerName: customerName,
+                paymentMethod: order.payment_method_title || 'غير محدد',
+                total: parseFloat(order.total || 0).toFixed(2),
+                viewTime: orderData[orderId]?.viewTime || deliveryTime,
+                deliveryTime: deliveryTime,
+            };
+            localStorage.setItem('orderData', JSON.stringify(orderData));
+        }
+
+        function removeMissingOrders(currentOrderIds) {
+            const orderData = JSON.parse(localStorage.getItem('orderData')) || {};
+            const updatedOrderData = {};
+            currentOrderIds.forEach(id => {
+                if (orderData[id]) updatedOrderData[id] = orderData[id];
+            });
+            localStorage.setItem('orderData', JSON.stringify(updatedOrderData));
+        }
+
+        function sendDeliveryConfirmation(orderId, customerName) {
+            const now = new Date();
+            const time = formatTime(now);
+            const message = `تم توصيل الطلب رقم ${orderId} إلى العميل ${customerName} في تمام الساعة ${time}`;
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${reportPhoneNumber}?text=${encodedMessage}`, '_blank');
+            showNotification('تم إرسال تأكيد التوصيل عبر WhatsApp', 'success');
+        }
+
+        function generateDeliveryReport() {
+            const orderData = JSON.parse(localStorage.getItem('orderData')) || {};
+            const deliveredOrders = Object.values(orderData).filter(o => o.deliveryTime);
+            const totalAmount = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.total), 0).toFixed(2);
+            const remainingOrders = orders['on-delivery'].length;
+            let report = `*تقرير بالطلبات التي تم توصيلها اليوم ${new Date().toLocaleDateString('ar-EG')}*\n~~~~~~~~~~~~~\n\n`;
+            deliveredOrders.forEach(order => {
+                report += `*الطلب رقم ${order.orderId}*\n`;
+                report += `*العميل ${order.customerName}*\n\n`;
+                report += `تم استلامه في الساعة ${formatTime(new Date(order.viewTime))}\n`;
+                report += `تم توصيله الساعة ${formatTime(new Date(order.deliveryTime))}\n\n`;
+                report += `طريقة الدفع ${order.paymentMethod}\n`;
+                report += `*المبلغ ${order.total} جم*\n`;
+                report += `----------\n`;
+            });
+            report += `\n*عدد الطلبات التي تم توصيلها: ${deliveredOrders.length}*\n`;
+            report += `*الإجمالي: ${totalAmount} جم*\n\n`;
+            report += `*طلبات لم يتم توصيلها: ${remainingOrders}*`;
+            return report;
+        }
+
+        function sendDeliveryReport() {
+            const report = generateDeliveryReport();
+            const encodedReport = encodeURIComponent(report);
+            window.open(`https://wa.me/${reportPhoneNumber}?text=${encodedReport}`, '_blank');
+            showNotification('تم إرسال تقرير التوصيلات عبر WhatsApp', 'success');
+        }
+
+        function filterOrdersByDriverPhone(orders, driverPhone) {
+            return orders.filter(order => {
+                const meta = order.meta_data?.find(m => m.key === 'delivery_person_phone');
+                const deliveryPhone = formatPhoneNumber(meta?.value || '');
+                return deliveryPhone === driverPhone;
+            });
+        }
+
+        function sortOrdersByDistance(orders, driverCoords) {
+            return orders
+                .map(order => {
+                    const location = extractLocation(order);
+                    if (!location) return null;
+                    return { order, distance: calculateDistance(driverCoords, location.coords), locationUrl: location.url };
+                })
+                .filter(item => item !== null)
+                .sort((a, b) => a.distance - b.distance);
+        }
+
+        async function fetchOrders(silent = false) {
+            const driverPhone = localStorage.getItem('driverPhone');
+            if (!driverPhone) {
+                document.getElementById('orders-on-delivery').innerHTML = '<p class="no-orders">يرجى إدخال رقم هاتفك في الإعدادات لعرض الطلبات</p>';
+                document.getElementById('orders-delivered').innerHTML = '<p class="no-orders">يرجى إدخال رقم هاتفك في الإعدادات لعرض الطلبات</p>';
+                document.getElementById('stats').innerHTML = '';
+                if (!silent) showNotification('يرجى إدخال رقم هاتفك في الإعدادات', 'warning');
+                hideLoading();
+                return;
+            }
+
+            if (!silent) showLoading();
+            try {
+                const statuses = ['on-delivery', 'delivered'];
+                const newOrders = { 'on-delivery': [], delivered: [] };
+                deliveredTotal = 0;
+
+                for (const status of statuses) {
+                    const url = `${storeUrl}/wp-json/wc/v3/orders?per_page=50&status=${status}`;
+                    const response = await fetch(url, {
+                        headers: { 'Authorization': 'Basic ' + btoa(`${consumerKey}:${consumerSecret}`) }
+                    });
+                    if (!response.ok) throw new Error(`خطأ في جلب الطلبات بحالة ${status}: ${response.status}`);
+                    const data = await response.json();
+                    if (!Array.isArray(data)) throw new Error(`استجابة غير متوقعة للحالة ${status}`);
+                    const filteredData = filterOrdersByDriverPhone(data, driverPhone);
+                    newOrders[status] = sortOrdersByDistance(filteredData, driverLocation);
+                    if (status === 'delivered') {
+                        deliveredTotal = filteredData.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+                    }
+                }
+
+                const currentOrderIds = [
+                    ...newOrders['on-delivery'].map(o => o.order.id),
+                    ...newOrders.delivered.map(o => o.order.id)
+                ];
+                removeMissingOrders(currentOrderIds);
+
+                if (JSON.stringify(newOrders) !== JSON.stringify(orders)) {
+                    orders = newOrders;
+                    displayStats();
+                    displayOrders();
+                    if (!silent) {
+                        newOrders['on-delivery'].forEach(({ order }) => {
+                            saveOrderViewTime(order.id);
+                        });
+                    }
+                    if (silent && orders['on-delivery'].length > 0) showNotification('تم تحديث الطلبات في الخلفية', 'info');
+                    if (newOrders['on-delivery'].length === 0 && orders.delivered.length > 0) {
+                        sendDeliveryReport();
+                    }
+                }
+            } catch (error) {
+                if (!silent) {
+                    showNotification(`خطأ في جلب الطلبات: ${error.message}`, 'error');
+                    document.getElementById('orders-on-delivery').innerHTML = '<p class="no-orders">خطأ في تحميل الطلبات</p>';
+                    document.getElementById('orders-delivered').innerHTML = '<p class="no-orders">خطأ في تحميل الطلبات</p>';
+                }
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayStats() {
+            const statsContainer = document.getElementById('stats');
+            statsContainer.innerHTML = `
+                <div class="stat-card" style="background-color: #3b82f620; border-color: var(--primary);">
+                    <h3>قيد التوصيل</h3>
+                    <p>${orders['on-delivery'].length}</p>
+                </div>
+                <div class="stat-card" style="background-color: #10b98120; border-color: var(--success);">
+                    <h3>تم التوصيل</h3>
+                    <p>${orders.delivered.length}</p>
+                </div>
+                <div class="stat-card" style="background-color: #f59e0b20; border-color: var(--warning);">
+                    <h3>إجمالي المسلم</h3>
+                    <p>${deliveredTotal.toFixed(2)} EGP</p>
+                </div>
+            `;
+        }
+
+        function displayOrders() {
+            const filter = document.getElementById('order-filter').value.toLowerCase();
+            ['on-delivery', 'delivered'].forEach(status => {
+                const container = document.getElementById(`orders-${status}`);
+                const filteredOrders = orders[status].filter(({ order }) => {
+                    const customer = `${order.billing?.first_name || ''} ${order.billing?.last_name || ''}`.toLowerCase();
+                    return order.id.toString().includes(filter) || customer.includes(filter);
+                });
+                document.getElementById(`${status}-count`).textContent = filteredOrders.length;
+                container.innerHTML = '';
+                if (filteredOrders.length === 0) {
+                    container.innerHTML = `<p class="no-orders">لا توجد طلبات ${status === 'on-delivery' ? 'قيد التوصيل' : 'تم توصيلها'}</p>`;
+                    return;
+                }
+                filteredOrders.forEach(({ order, distance, locationUrl }) => {
+                    const billing = order.billing || {};
+                    const customerName = `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'غير معروف';
+                    const address = `${billing.address_1 || ''}, ${billing.city || ''}, ${billing.country || ''}`.trim().replace(/,+/g, ',') || 'غير متوفر';
+                    const products = order.line_items?.map(item => `${item.name} (x${item.quantity})`).join(', ') || 'غير متوفر';
+                    const paymentMethod = order.payment_method_title || 'غير محدد';
+                    const paymentAlert = getPaymentAlert(paymentMethod);
+                    const viewTime = saveOrderViewTime(order.id);
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'order-card';
+                    orderCard.innerHTML = `
+                        <div class="order-card-header" data-order-id="${order.id}">
+                            <div class="info">
+                                <h3><span class="order-id">#${order.id}</span> - ${customerName} <span style="color: var(--success);">${parseFloat(order.total || 0).toFixed(2)} EGP</span></h3>
+                                <span class="view-time"><i class="fas fa-clock"></i> استلم في: ${formatTime(new Date(viewTime))}</span>
+                            </div>
+                            <span class="status" style="background-color: ${status === 'on-delivery' ? '#3b82f6' : '#10b981'};">
+                                ${status === 'on-delivery' ? 'قيد التوصيل' : 'تم التوصيل'}
+                            </span>
+                        </div>
+                        <div class="order-card-details">
+                            <div class="section">
+                                <h4><i class="fas fa-info-circle"></i> تفاصيل الطلب</h4>
+                                <p><i class="fas fa-hashtag"></i> <strong>رقم الطلب:</strong> #${order.id}</p>
+                                <p><i class="fas fa-road"></i> <strong>المسافة:</strong> ${distance.toFixed(2)} كم</p>
+                                <p><i class="fas fa-coins"></i> <strong>الإجمالي:</strong> ${parseFloat(order.total || 0).toFixed(2)} EGP</p>
+                                <p><i class="fas fa-credit-card"></i> <strong>طريقة الدفع:</strong> ${paymentMethod}</p>
+                                <div class="payment-alert"><i class="${paymentAlert.icon}"></i> ${paymentAlert.message}</div>
+                                <p><i class="fas fa-box"></i> <strong>المنتجات:</strong> ${products}</p>
+                            </div>
+                            <div class="section">
+                                <h4><i class="fas fa-user"></i> العميل</h4>
+                                <p><i class="fas fa-user-tag"></i> <strong>الاسم:</strong> ${customerName}</p>
+                                <p><i class="fas fa-phone-alt"></i> <strong>الهاتف:</strong> ${billing.phone || 'غير متوفر'}</p>
+                            </div>
+                            <div class="section">
+                                <h4><i class="fas fa-map-marker-alt"></i> العنوان</h4>
+                                <p><i class="fas fa-home"></i> <strong>العنوان:</strong> ${address}</p>
+                                <p><i class="fas fa-map"></i> <strong>الموقع:</strong> <a href="${locationUrl || '#'}" target="_blank" ${!locationUrl ? 'style="color: grey; pointer-events: none; text-decoration: line-through;"' : ''}>فتح الموقع</a></p>
+                            </div>
+                            <div class="section action-buttons">
+                                <a href="tel:${billing.phone || '#'}" class="action-btn btn-call" title="الاتصال بالعميل" ${!billing.phone ? 'style="pointer-events: none; opacity: 0.5;"' : ''}><i class="fas fa-phone"></i> اتصال</a>
+                                <a href="${locationUrl || '#'}" target="_blank" class="action-btn btn-map" title="فتح الموقع في الخرائط" ${!locationUrl ? 'style="pointer-events: none; opacity: 0.5;"' : ''}><i class="fas fa-map-marker-alt"></i> خريطة</a>
+                                <button class="action-btn btn-whatsapp" onclick="sendToWhatsApp(${order.id})" title="إرسال رسالة عبر WhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                                ${status === 'on-delivery' ? `<button class="action-btn btn-delivered" onclick="confirmOrderStatus(${order.id})" title="تأكيد تسليم الطلب"><i class="fas fa-check"></i> تم التوصيل</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(orderCard);
+                });
+            });
+        }
+
+        function confirmOrderStatus(orderId) {
+            Swal.fire({
+                title: 'تأكيد التوصيل',
+                text: `هل أنت متأكد من تسليم الطلب #${orderId}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، تم التوصيل',
+                cancelButtonText: 'إلغاء',
+            }).then((result) => {
+                if (result.isConfirmed) updateOrderStatus(orderId);
+            });
+        }
+
+        async function updateOrderStatus(orderId) {
+            showLoading();
+            try {
+                const response = await fetch(`${storeUrl}/wp-json/wc/v3/orders/${orderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(`${consumerKey}:${consumerSecret}`),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'delivered' }),
+                });
+                if (!response.ok) throw new Error('فشل تحديث الحالة');
+                const order = orders['on-delivery'].find(o => o.order.id === orderId)?.order;
+                if (order) {
+                    const billing = order.billing || {};
+                    const customerName = `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'غير معروف';
+                    saveOrderDelivery(orderId, order);
+                    sendDeliveryConfirmation(orderId, customerName);
+                }
+                const remainingOrders = orders['on-delivery'].length - 1;
+                let message = remainingOrders > 0
+                    ? ['أحسنت! باقي ' + remainingOrders + ' طلبات!', 'عمل رائع! ' + remainingOrders + ' طلبات متبقية!', 'ممتاز! ' + remainingOrders + ' طلبات أخرى!'][Math.floor(Math.random() * 3)]
+                    : 'رائع! لقد أكملت جميع الطلبات لهذا اليوم! 🎉';
+                showNotification(message, 'success', '🏆');
+                await fetchOrders(true);
+            } catch (error) {
+                showNotification(`خطأ في تحديث الحالة: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function sendToWhatsApp(orderId) {
+            const order = [...orders['on-delivery'], ...orders.delivered].find(o => o.order.id === orderId)?.order;
+            if (!order) return showNotification('الطلب غير موجود!', 'error');
+            const billing = order.billing || {};
+            const phone = formatPhoneNumber(billing.phone);
+            if (!phone || !phone.startsWith('+20')) return showNotification('رقم هاتف العميل غير صحيح!', 'error');
+            const driverName = localStorage.getItem('driverName') || 'المندوب';
+            const hour = new Date().getHours();
+            const greeting = hour < 12 ? 'صباح الخير' : 'مساء الخير';
+            const message = `${greeting}\nمع حضرتك ${driverName}، المندوب المسؤول عن توصيل الطلب رقم ${order.id} لحضرتك\nلقد تحركت الآن وفي الطريق إليك\nإجمالي سعر الطلب: ${parseFloat(order.total || 0).toFixed(2)} EGP`;
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+            showNotification('جاري فتح WhatsApp...', 'success');
+        }
+
+        function setDriverSettings() {
+            Swal.fire({
+                title: 'إعدادات المندوب',
+                html: `
+                    <div style="text-align: right;">
+                        <label style="display: block; margin-bottom: 8px;">اسم المندوب</label>
+                        <input id="swal-input-name" class="swal2-input" placeholder="أدخل اسمك" value="${localStorage.getItem('driverName') || ''}">
+                        <label style="display: block; margin-top: 16px; margin-bottom: 8px;">رقم الهاتف</label>
+                        <input id="swal-input-phone" class="swal2-input" type="tel" placeholder="أدخل رقم هاتفك" value="${localStorage.getItem('driverPhone')?.replace('+20', '') || ''}">
+                    </div>
+                `,
+                showCancelButton: true,
+                cancelButtonText: 'إلغاء',
+                confirmButtonText: 'حفظ',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-input-name').value;
+                    const phone = document.getElementById('swal-input-phone').value;
+                    if (!name) return Swal.showValidationMessage('يرجى إدخال الاسم!');
+                    if (!phone || !/^\d{10,11}$/.test(phone.replace(/\s+/g, ''))) {
+                        return Swal.showValidationMessage('يرجى إدخال رقم هاتف صحيح (10 أو 11 رقمًا)!');
+                    }
+                    return { name, phone: formatPhoneNumber(phone) };
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { name, phone } = result.value;
+                    localStorage.setItem('driverName', name);
+                    localStorage.setItem('driverPhone', phone);
+                    showNotification('تم حفظ إعدادات المندوب!', 'success');
+                    fetchOrders();
+                }
+            });
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('theme-toggle').innerHTML = `
+                <i class="fas fa-${newTheme === 'light' ? 'moon' : 'sun'}"></i> ${newTheme === 'light' ? 'الوضع الليلي' : 'الوضع النهاري'}
+            `;
+        }
+
+        function refreshOrders() {
+            fetchOrders();
+            showNotification('جاري تحديث الطلبات...', 'info');
+        }
+
+        const debounce = (func, delay) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-toggle').innerHTML = `
+                <i class="fas fa-${savedTheme === 'light' ? 'moon' : 'sun'}"></i> ${savedTheme === 'light' ? 'الوضع الليلي' : 'الوضع النهاري'}
+            `;
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            document.getElementById('set-driver-settings').addEventListener('click', setDriverSettings);
+            document.getElementById('order-filter').addEventListener('input', debounce(displayOrders, 300));
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+                });
+            });
+            document.addEventListener('click', (e) => {
+                const header = e.target.closest('.order-card-header');
+                if (header) {
+                    const details = header.nextElementSibling;
+                    details.classList.toggle('active');
+                }
+            });
+            if (localStorage.getItem('driverPhone')) {
+                fetchOrders();
+            } else {
+                showWelcomeMessage();
+            }
+            setInterval(() => fetchOrders(true), 30000);
+        });
+    </script>
+</body>
+</html>
