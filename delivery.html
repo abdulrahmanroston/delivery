@@ -49,7 +49,7 @@
             color: var(--text-primary);
             direction: rtl;
             min-height: 100vh;
-            font-size: 14px;
+            font-size: 16px;
         }
         .container {
             max-width: 1400px;
@@ -246,8 +246,8 @@
         .orders-list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding: 10px;
+            gap: 10px;
+            padding: 5px;
         }
         .order-card {
             background: var(--card-bg);
@@ -259,16 +259,7 @@
             animation: slideIn 0.4s ease-out;
             background: var(--gradient-bg);
         }
-        .order-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 6px;
-            height: 100%;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
+     
         .order-card:hover::before {
             width: 12px;
         }
@@ -336,11 +327,11 @@
             margin-bottom: 16px;
             padding: 12px;
             border-radius: 6px;
-            background: var(--gradient-bg);
+        
         }
         .order-card-details .section h4 {
             margin: 0 0 10px;
-            font-size: 0.9rem;
+            font-size: 1.4rem;
             color: var(--text-primary);
             font-weight: 600;
             text-transform: uppercase;
@@ -353,11 +344,13 @@
         .order-card-details .section p,
         .order-card-details .section a {
             margin: 8px 0;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: normal;
+            overflow-wrap: break-word;
         }
         .order-card-details .section a {
             color: var(--primary);
@@ -380,13 +373,14 @@
             border: 1px solid #fde68a;
         }
         .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
+            display: flex;
+            flex-direction: column;
             padding: 12px 0;
         }
         .action-btn {
-            padding: 12px 16px;
+            width: 90%;
+            padding: 12px 16px !important;
+            margin: 10px auto !important;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -419,9 +413,6 @@
         .action-btn:active::after {
             width: 200px;
             height: 200px;
-        }
-        .action-btn i {
-            font-size: 1rem;
         }
         .action-btn[title]:hover::before {
             content: attr(title);
@@ -491,23 +482,46 @@
             to { height: auto; opacity: 1; }
         }
         @media (max-width: 768px) {
+            body {
+                font-size: 12px;
+            }
             .container {
                 margin: 0;
                 border-radius: 0;
             }
             .header h1 {
-                font-size: 1.2rem;
+                font-size: 1rem;
             }
             .header-btn {
-                padding: 8px 10px;
-                font-size: 0.8rem;
+                padding: 6px 8px;
+                font-size: 0.75rem;
             }
             .action-btn {
-                font-size: 0.85rem;
-                padding: 10px;
+                font-size: 0.75rem;
+                padding: 8px;
             }
             .order-card-header h3 {
+                font-size: 1.2rem;
+            }
+            .order-card-details .section p,
+            .order-card-details .section a {
+                font-size: 1.2rem;
+            }
+            .order-card-details .section h4 {
                 font-size: 1rem;
+            }
+            .stat-card h3 {
+                font-size: 0.8rem;
+            }
+            .stat-card p {
+                font-size: 1.5rem;
+            }
+            .tab {
+                font-size: 0.75rem;
+                padding: 8px 16px;
+            }
+            .no-orders {
+                font-size: 0.9rem;
             }
             .order-card-header {
                 grid-template-columns: 1fr;
@@ -515,6 +529,33 @@
             }
             .order-card-header .status {
                 justify-self: start;
+            }
+        }
+        @media (max-width: 576px) {
+            body {
+                font-size: 11px;
+            }
+            .order-card-details .section p,
+            .order-card-details .section a {
+                font-size: 1rem;
+            }
+            .action-btn {
+                font-size: 0.7rem;
+                padding: 6px;
+            }
+            .header h1 {
+                font-size: 0.9rem;
+            }
+            .header-btn {
+                font-size: 0.7rem;
+                padding: 5px 7px;
+            }
+            .tab {
+                font-size: 0.7rem;
+                padding: 6px 12px;
+            }
+            .stat-card p {
+                font-size: 1.4rem;
             }
         }
         .swal2-popup {
@@ -577,7 +618,7 @@
         const consumerKey = 'ck_f40406bbecba206fc13e711e2f8df86de26dbbc7';
         const consumerSecret = 'cs_62458ae4d624c3a04a515c770345466497fd88a5';
         const storeUrl = 'https://tenderfrozen.com';
-        const driverLocation = [30.0259347, 31.4875687];
+        const driverLocation = [30.231695, 31.501283];
         const reportPhoneNumber = '+201222222383';
         let orders = { 'on-delivery': [], delivered: [] };
         let deliveredTotal = 0;
@@ -611,7 +652,7 @@
             if (!localStorage.getItem('welcomeShown')) {
                 Swal.fire({
                     title: 'مرحبًا بك!',
-                    text: 'هذه الصفحة لإدارة طلبات التوصيل. يرجى إدخال رقم هاتفك في الإعدادات لعرض الطلبات المخصصة لك.',
+                    text: 'هذه الصفحة لإدارة طلبات التوصيل. يرجى إدخال رقم هاتفك في الإعدادات لنعرض الطلبات المخصصة لك.',
                     icon: 'info',
                     confirmButtonText: 'حسنًا',
                 }).then(() => {
@@ -764,14 +805,30 @@
         }
 
         function sortOrdersByDistance(orders, driverCoords) {
-            return orders
-                .map(order => {
-                    const location = extractLocation(order);
-                    if (!location) return null;
-                    return { order, distance: calculateDistance(driverCoords, location.coords), locationUrl: location.url };
-                })
-                .filter(item => item !== null)
-                .sort((a, b) => a.distance - b.distance);
+            const ordersWithDistance = [];
+            const ordersWithoutLocation = [];
+
+            orders.forEach(order => {
+                const location = extractLocation(order);
+                if (location) {
+                    ordersWithDistance.push({
+                        order,
+                        distance: calculateDistance(driverCoords, location.coords),
+                        locationUrl: location.url
+                    });
+                } else {
+                    ordersWithoutLocation.push({
+                        order,
+                        distance: Infinity,
+                        locationUrl: null
+                    });
+                }
+            });
+
+            // Sort orders with valid locations by distance
+            ordersWithDistance.sort((a, b) => a.distance - b.distance);
+            // Append orders without locations at the end
+            return [...ordersWithDistance, ...ordersWithoutLocation];
         }
 
         async function fetchOrders(silent = false) {
@@ -790,6 +847,7 @@
                 const statuses = ['on-delivery', 'delivered'];
                 const newOrders = { 'on-delivery': [], delivered: [] };
                 deliveredTotal = 0;
+                const allOrderIds = [];
 
                 for (const status of statuses) {
                     const url = `${storeUrl}/wp-json/wc/v3/orders?per_page=50&status=${status}`;
@@ -800,17 +858,15 @@
                     const data = await response.json();
                     if (!Array.isArray(data)) throw new Error(`استجابة غير متوقعة للحالة ${status}`);
                     const filteredData = filterOrdersByDriverPhone(data, driverPhone);
+                    console.log(`Filtered ${status} orders:`, filteredData); // Debug log
                     newOrders[status] = sortOrdersByDistance(filteredData, driverLocation);
+                    allOrderIds.push(...filteredData.map(o => o.id));
                     if (status === 'delivered') {
                         deliveredTotal = filteredData.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
                     }
                 }
 
-                const currentOrderIds = [
-                    ...newOrders['on-delivery'].map(o => o.order.id),
-                    ...newOrders.delivered.map(o => o.order.id)
-                ];
-                removeMissingOrders(currentOrderIds);
+                removeMissingOrders(allOrderIds);
 
                 if (JSON.stringify(newOrders) !== JSON.stringify(orders)) {
                     orders = newOrders;
@@ -870,6 +926,7 @@
                     return;
                 }
                 filteredOrders.forEach(({ order, distance, locationUrl }) => {
+                    console.log(`Displaying order ${order.id}:`, order.line_items); // Debug log
                     const billing = order.billing || {};
                     const customerName = `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'غير معروف';
                     const address = `${billing.address_1 || ''}, ${billing.city || ''}, ${billing.country || ''}`.trim().replace(/,+/g, ',') || 'غير متوفر';
@@ -893,11 +950,10 @@
                             <div class="section">
                                 <h4><i class="fas fa-info-circle"></i> تفاصيل الطلب</h4>
                                 <p><i class="fas fa-hashtag"></i> <strong>رقم الطلب:</strong> #${order.id}</p>
-                                <p><i class="fas fa-road"></i> <strong>المسافة:</strong> ${distance.toFixed(2)} كم</p>
+                                <p><i class="fas fa-road"></i> <strong>المسافة:</strong> ${distance === Infinity ? 'غير متوفر' : distance.toFixed(2) + ' كم'}</p>
                                 <p><i class="fas fa-coins"></i> <strong>الإجمالي:</strong> ${parseFloat(order.total || 0).toFixed(2)} EGP</p>
                                 <p><i class="fas fa-credit-card"></i> <strong>طريقة الدفع:</strong> ${paymentMethod}</p>
                                 <div class="payment-alert"><i class="${paymentAlert.icon}"></i> ${paymentAlert.message}</div>
-                                <p><i class="fas fa-box"></i> <strong>المنتجات:</strong> ${products}</p>
                             </div>
                             <div class="section">
                                 <h4><i class="fas fa-user"></i> العميل</h4>
