@@ -252,15 +252,17 @@
         }
 
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 24px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 5px;
+            padding: 24px 10px;
             background: var(--surface);
             border-bottom: 1px solid var(--border);
         }
 
         .stat-card {
+            width: 30%;
             background: var(--surface);
             border: 2px solid var(--border);
             border-radius: var(--border-radius-lg);
@@ -1021,7 +1023,6 @@
         <div class="container">
             <header class="header">
                 <div class="header-content">
-                    <h1>إدارة طلبات التوصيل</h1>
                     <div class="header-badge">Tender Frozen</div>
                 </div>
                 <div class="header-actions">
@@ -1934,8 +1935,6 @@ function handleLocationClick(orderId) {
             if (order && order.deliveryLocationUrl) {
                 message += `📍 موقع التسليم: ${order.deliveryLocationUrl}\n`;
             }
-            
-            message += `\nشكرًا لكم - Tender Frozen ❄️`;
             
             const encodedMessage = encodeURIComponent(message);
             window.open(`https://wa.me/${CONFIG.reportPhoneNumber}?text=${encodedMessage}`, '_blank');
