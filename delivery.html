@@ -1009,6 +1009,14 @@
             border-radius: var(--border-radius) !important;
             font-weight: 600 !important;
         }
+        .btn-payment {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.btn-payment:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
     </style>
 </head>
 <body>
@@ -1594,7 +1602,7 @@
                     const paymentMethod = order.payment_method_title || 'غير محدد';
                     const paymentAlert = getPaymentAlert(paymentMethod);
                     const viewTime = saveOrderViewTime(order.id);
-
+console.log(order);
                     const orderCard = document.createElement('div');
                     orderCard.className = 'order-card';
                     orderCard.innerHTML = `
@@ -1667,8 +1675,18 @@
                                     </div>
                                     <div class="detail-item">
                                         <i class="fas fa-calendar-alt"></i>
-                                        <div class="detail-label">تاريخ الطلب:</div>
-                                        <div class="detail-value">${new Date(order.date_created).toLocaleDateString('ar-EG')}</div>
+                                        <div class="detail-label">يوم التوصيل</div>
+                                        <div class="detail-value">${order.additional.order_date}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fa-solid fa-clock"></i>
+                                        <div class="detail-label">وقت التوصيل</div>
+                                        <div class="detail-value">${order.additional.order_time}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fa-solid fa-clock"></i>
+                                        <div class="detail-label">ملاحظات العميل/div>
+                                        <div class="detail-value">${order.additional.note}</div>
                                     </div>
                                 </div>
                             </div>
@@ -1688,34 +1706,37 @@
                             ` : ''}
 
                             <div class="actions-grid">
-                                <a href="tel:${billing.phone}" class="action-btn btn-call" title="اتصل بالعميل">
-                                    <i class="fas fa-phone"></i>
-                                    اتصل بالعميل
-                                </a>
-                                ${locationUrl ? `
-                                
-                                    <a href="${locationUrl}" target="_blank" class="action-btn btn-map" title="عرض الموقع على الخريطة" onclick="handleLocationClick(${order.id})">
-                                    عرض الموقع
-                                    </a>
-                                    
-                                ` : ''}
-                                <a href="https://wa.me/${formatPhoneNumber(billing.phone)}?text=${encodeURIComponent(`مرحبا ${customerName}، مندوب التوصيل في الطريق إليك`)}" target="_blank" class="action-btn btn-whatsapp" title="إرسال رسالة واتساب للعميل">
-                                    <i class="fab fa-whatsapp"></i>
-                                    واتساب
-                                </a>
-                                ${status === 'on-delivery' ? `
-                                    <button class="action-btn btn-delivered" onclick="confirmOrderStatus(${order.id})" title="تأكيد تسليم الطلب">
-                                        <i class="fas fa-check-circle"></i>
-                                        تم التوصيل
-                                    </button>
-                                ` : ''}
-                                ${status === 'delivered' ? `
-                                    <button class="action-btn btn-report btn-disabled" title="لا يمكنك الإبلاغ عن طلب تم تسليمه">
-                                        <i class="fas fa-file-alt"></i>
-                                        إبلاغ
-                                    </button>
-                                ` : ''}
-                            </div>
+    <a href="tel:${billing.phone}" class="action-btn btn-call" title="اتصل بالعميل">
+        <i class="fas fa-phone"></i>
+        اتصل بالعميل
+    </a>
+    ${locationUrl ? `
+        <a href="${locationUrl}" target="_blank" class="action-btn btn-map" title="عرض الموقع على الخريطة" onclick="handleLocationClick(${order.id})">
+            <i class="fas fa-map-marker-alt"></i>
+            عرض الموقع
+        </a>
+    ` : ''}
+    <a href="https://wa.me/${formatPhoneNumber(billing.phone)}?text=${encodeURIComponent(`مرحبا ${customerName}، مندوب التوصيل في الطريق إليك`)}" target="_blank" class="action-btn btn-whatsapp" title="إرسال رسالة واتساب للعميل">
+        <i class="fab fa-whatsapp"></i>
+        واتساب
+    </a>
+    ${status === 'on-delivery' ? `
+        <button class="action-btn btn-payment" onclick="sendPaymentLink(${order.id})" title="إرسال رابط الدفع للعميل">
+            <i class="fas fa-credit-card"></i>
+            إرسال رابط الدفع
+        </button>
+        <button class="action-btn btn-delivered" onclick="confirmOrderStatus(${order.id})" title="تأكيد تسليم الطلب">
+            <i class="fas fa-check-circle"></i>
+            تم التوصيل
+        </button>
+    ` : ''}
+    ${status === 'delivered' ? `
+        <button class="action-btn btn-report btn-disabled" title="لا يمكنك الإبلاغ عن طلب تم تسليمه">
+            <i class="fas fa-file-alt"></i>
+            إبلاغ
+        </button>
+    ` : ''}
+</div>
                         </div>
                     `;
                     container.appendChild(orderCard);
@@ -2059,6 +2080,90 @@ function handleLocationClick(orderId) {
                 }
             });
         }
+
+
+        function sendPaymentLink(orderId) {
+    const order = orders['on-delivery'].find(o => o.order.id === orderId)?.order;
+    if (!order) {
+        showNotification('الطلب غير موجود!', 'error');
+        return;
+    }
+
+    const billing = order.billing || {};
+    const customerName = `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'غير معروف';
+    const phone = formatPhoneNumber(billing.phone);
+    
+    // البحث عن payment_url في meta_data
+    const paymentUrlMeta = order.meta_data?.find(m => m.key === 'payment_url');
+    const paymentUrl = order.payment_url ;
+    
+    if (!paymentUrl) {
+        showNotification('رابط الدفع غير متوفر لهذا الطلب', 'warning');
+        return;
+    }
+
+    if (!phone || !phone.startsWith('+20')) {
+        showNotification('رقم هاتف العميل غير صحيح', 'error');
+        return;
+    }
+
+    // تأكيد الإرسال
+    Swal.fire({
+        title: '💳 إرسال رابط الدفع',
+        html: `
+            <div style="text-align: right; line-height: 1.8;">
+                <p><strong>الطلب:</strong> #${orderId}</p>
+                <p><strong>العميل:</strong> ${customerName}</p>
+                <p><strong>المبلغ:</strong> ${parseFloat(order.total || 0).toFixed(2)} جنيه</p>
+                <p><strong>رقم الهاتف:</strong> ${phone}</p>
+                <br>
+                <p>هل تريد إرسال رابط الدفع للعميل عبر واتساب؟</p>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '📱 إرسال الرابط',
+        cancelButtonText: '❌ إلغاء',
+        confirmButtonColor: '#25D366',
+        cancelButtonColor: '#6b7280'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // إنشاء الرسالة باللغة الإنجليزية
+    const message = `*Hello, ${customerName}* 👋
+            
+*Your order 🔢 Order #${orderId} is ready for payment! Here are the details:*
+        
+*Total Amount:* ${parseFloat(order.total || 0).toFixed(2)} EGP
+ـــــــــــــــ
+
+*How to pay with Visa \ Mastercard:*
+
+*1. Click Here for Payment Now:*
+ ${paymentUrl}
+
+*2. If You Have Account , log in to your account*
+
+*3. If you don't have an account, just Type the Same Order Email*
+Your Email is: *${billing.email}*
+
+*4. Press "Pay Now" & complete the payment*
+
+If you have any questions or need assistance, please don't hesitate to contact us.
+
+You can explore all our delicious frozen meals anytime at:
+https://tenderfrozen.com
+
+*Thank you for choosing Tender Frozen!*
+`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+            
+            showNotification('تم إرسال رابط الدفع بنجاح عبر واتساب', 'success');
+        }
+    });
+}
+
 
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
